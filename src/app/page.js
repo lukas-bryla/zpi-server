@@ -1,94 +1,75 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 
 export default function Home() {
+  const [difficulty, setDifficulty] = useState("easy");
+  const [nickname, setNickname] = useState(""); // Nový stav pro přezdívku
+  const router = useRouter();
+
+  const startNewGame = async () => {
+    try {
+      const response = await fetch("/api/save-sequence", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ difficulty, nickname }), // Posíláme pouze obtížnost
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create new game");
+      }
+
+      const { id } = await response.json(); // Server vrátí ID nové hry
+      router.push(`/game/${id}`); // Přesměruj uživatele na herní stránku
+    } catch (error) {
+      console.error("Error starting new game:", error);
+    }
+  };
+
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+      <header className={styles.header}>
+        <h1>Paměťové Piáno</h1>
+        <p>Procvičte si paměť a rytmus!</p>
+      </header>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+      <main className={styles.main}>
+        <section className={styles.section}>
+          <div>
+            <label htmlFor="nickname">Zadej přezdívku:</label>
+            <input
+              id="nickname"
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="Přezdívka"
             />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
+          </div>
+          <div>
+            <label htmlFor="difficulty">Zvolte obtížnost:</label>
+            <select
+              id="difficulty"
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value)}
+            >
+              <option value="easy">Lehká (2 tóny)</option>
+              <option value="medium">Střední (4 tóny)</option>
+              <option value="hard">Těžká (7 tónů)</option>
+              <option value="deathwish">Deathwish (11 tónů)</option>
+            </select>
+          </div>
+          <button className={styles.button} onClick={startNewGame}>
+            Vytvořit hru
+          </button>
+        </section>
       </main>
+
       <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+        <p>ZPI 2024 Paměťové Piáno - Lukáš Brýla</p>
       </footer>
     </div>
   );

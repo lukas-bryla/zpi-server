@@ -1,0 +1,135 @@
+/* General page layout */
+.page {
+  font-family: Arial, sans-serif;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffecd2, #fcb69f);
+}
+
+/* Header styling */
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  color: #444;
+  margin: 0;
+}
+
+.header .lives {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.header .lives span {
+  font-size: 1.5rem;
+  color: red;
+  margin: 0 5px;
+}
+
+/* Main content */
+.main {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.results,
+.details {
+  margin-bottom: 20px;
+}
+
+.results h2,
+.details h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.results p,
+.details p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.results ul,
+.details ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.results li,
+.details li {
+  margin-bottom: 5px;
+  font-size: 1rem;
+  color: #444;
+}
+
+/* Loading and incomplete game messages */
+.loading,
+.incomplete {
+  background: #fcb69f;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.loading h2,
+.incomplete h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.loading p,
+.incomplete p {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #fff;
+}
+
+/* Footer styling */
+.footer {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #777;
+  text-align: center;
+}
+
+.button {
+  background-color: orange;
+  color: #fff;
+  font-weight: 700;
+  width: 100%;
+  border: 0;
+  cursor: pointer;
+  padding: 19px 30px;
+  border-radius: 8px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  font-size: 15.5px;
+  transition: background-color 0.5s ease-out, color 0.5s ease-out;
+}
