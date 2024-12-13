@@ -3,6 +3,8 @@ import { MongoClient, ObjectId } from "mongodb";
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 
+const VALID_FREQUENCIES = [262, 294, 330, 349, 392, 440, 494];
+
 export async function POST(req) {
   try {
     const { id, espData } = await req.json();
@@ -12,6 +14,20 @@ export async function POST(req) {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
+    }
+
+    // Validace frekvencí
+    const invalidFrequencies = espData.filter(
+      (freq) => !VALID_FREQUENCIES.includes(freq)
+    );
+    if (invalidFrequencies.length > 0) {
+      return new Response(
+        JSON.stringify({ error: "Invalid frequencies detected" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     await client.connect();

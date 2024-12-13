@@ -1,9 +1,9 @@
 import { MongoClient, ObjectId } from "mongodb";
 
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
+const uri = process.env.MONGODB_URI; // Načti MongoDB URI z prostředí
 
 export async function POST(req) {
+  let client; // Deklarace klienta na vyšší úrovni
   try {
     const { id, difficulty, nickname } = await req.json();
 
@@ -33,11 +33,15 @@ export async function POST(req) {
       );
     }
 
-    const sequence = Array.from({ length: difficultyLevels[difficulty] }, () =>
-      Math.floor(200 + Math.random() * 800)
+    const VALID_FREQUENCIES = [262, 294, 330, 349, 392, 440, 494];
+    const sequence = Array.from(
+      { length: difficultyLevels[difficulty] },
+      () =>
+        VALID_FREQUENCIES[Math.floor(Math.random() * VALID_FREQUENCIES.length)]
     );
 
-    await client.connect();
+    client = new MongoClient(uri); // Inicializace MongoDB klienta
+    await client.connect(); // Připojení k MongoDB
     const db = client.db("memory-piano");
     const collection = db.collection("games");
 
@@ -92,7 +96,7 @@ export async function POST(req) {
     });
   } finally {
     if (client) {
-      await client.close();
+      await client.close(); // Zavření připojení k MongoDB
     }
   }
 }
