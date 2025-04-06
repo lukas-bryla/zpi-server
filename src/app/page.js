@@ -1,75 +1,90 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import styles from "./page.module.css";
+import { useState, useEffect } from "react";
+import styles from "./page.module.css"; // Assuming you’ll reuse or create similar styles
 
 export default function Home() {
-  const [difficulty, setDifficulty] = useState("easy");
-  const [nickname, setNickname] = useState(""); // Nový stav pro přezdívku
-  const router = useRouter();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const startNewGame = async () => {
-    try {
-      const response = await fetch("/api/save-sequence", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ difficulty, nickname }), // Posíláme pouze obtížnost
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create new game");
+  // Fetch data when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/data/get");
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const { id } = await response.json(); // Server vrátí ID nové hry
-      router.push(`/game/${id}`); // Přesměruj uživatele na herní stránku
-    } catch (error) {
-      console.error("Error starting new game:", error);
-    }
-  };
+    fetchData();
+  }, []);
 
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1>Paměťové Piáno</h1>
-        <p>Procvičte si paměť a rytmus!</p>
+        <h1>Environmental Data</h1>
+        <p>View all recorded environmental measurements</p>
       </header>
 
       <main className={styles.main}>
         <section className={styles.section}>
-          <div>
-            <label htmlFor="nickname">Zadej přezdívku:</label>
-            <input
-              id="nickname"
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder="Přezdívka"
-            />
-          </div>
-          <div>
-            <label htmlFor="difficulty">Zvolte obtížnost:</label>
-            <select
-              id="difficulty"
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-            >
-              <option value="easy">Lehká (2 tóny)</option>
-              <option value="medium">Střední (4 tóny)</option>
-              <option value="hard">Těžká (7 tónů)</option>
-              <option value="deathwish">Deathwish (11 tónů)</option>
-            </select>
-          </div>
-          <button className={styles.button} onClick={startNewGame}>
-            Vytvořit hru
-          </button>
+          {loading ? (
+            <p>Loading data...</p>
+          ) : error ? (
+            <p className={styles.error}>Error: {error}</p>
+          ) : data.length === 0 ? (
+            <p>No data available.</p>
+          ) : (
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>CO (ppm)</th>
+                  <th>Methane (%)</th>
+                  <th>Fire Distance (cm)</th>
+                  <th>Temperature (°C)</th>
+                  <th>Fire Present</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((entry) => (
+                  <tr key={entry._id}>
+                    <td>{new Date(entry.timestamp).toLocaleString()}</td>
+                    <td>{entry.coPpmCount ?? "N/A"}</td>
+                    <td>{entry.methanePercentage ?? "N/A"}</td>
+                    <td>{entry.fireDistanceCm ?? "N/A"}</td>
+                    <td>{entry.temperatureCelsius ?? "N/A"}</td>
+                    <td>
+                      {entry.isFirePresent !== undefined
+                        ? entry.isFirePresent
+                          ? "Yes"
+                          : "No"
+                        : "N/A"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </section>
       </main>
 
       <footer className={styles.footer}>
-        <p>ZPI 2024 Paměťové Piáno - Lukáš Brýla</p>
+        <p>
+          Robotický pes detekující přítomnost plamene, měřící teplotu a
+          koncentraci hořlavých plynů <br /> Tento skupinový projekt vznikl v
+          rámci předmětu ZPP (Základy programátorské praxe) na Fakultě
+          aplikovaných věd ZČU
+        </p>
       </footer>
     </div>
   );
